@@ -1,9 +1,11 @@
 import openai
+import os
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from database import  get_session
 from app.models import User, Message
 from pydantic import BaseModel
+from dotenv import load_dotenv
 
 router = APIRouter()
 
@@ -12,7 +14,8 @@ class MessageCreate(BaseModel):
     username: str
     question: str
 
-openai.api_key = "API_KEY_OPENAI"
+load_dotenv()
+openai.api_key = os.getenv("API_KEY_OPENAI")
 
 @router.post("/ask")
 def ask(message: MessageCreate, session: Session = Depends(get_session)):
@@ -32,7 +35,7 @@ def ask(message: MessageCreate, session: Session = Depends(get_session)):
         max_tokens=150
     )
 
-    response_text = response.choices[0]["message"]["content"].text.strip()
+    response_text = response["choices"][0]["message"]["content"].text.strip()
 
     #guarda la conversación el la base de datos
     new_message = Message(user_id=user.id, question=message.question, response=response_text)
