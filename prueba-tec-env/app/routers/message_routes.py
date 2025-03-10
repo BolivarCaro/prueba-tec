@@ -21,7 +21,7 @@ def ask(message: MessageCreate, session: Session = Depends(get_session)):
         raise HTTPException(status_code=404, detail="usuario no encontrado")
     #Rol del GPT
     system_message = {
-        "Rol": "system",
+        "role": "system",
         "content": "Eres un experto en evaluación de riesgos laborales."
     }
     response = openai.ChatCompletion.create(
