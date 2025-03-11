@@ -23,19 +23,20 @@ def ask(message: MessageCreate, session: Session = Depends(get_session)):
     if not user:
         raise HTTPException(status_code=404, detail="usuario no encontrado")
     #Rol del GPT
-    system_message = {
-        "role": "system",
-        "content": "Eres un experto en evaluación de riesgos laborales."
-    }
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[ system_message, #se agrega el contexto del rol
-                  {"role": "user", "content": message.question}
-                  ],
-        max_tokens=150
-    )
+    system_message = {"role": "system", "content": "Eres un experto en riesgos laborales."}
+    user_message = {"role": "user", "content": "message.question"}
 
-    response_text = response["choices"][0]["message"]["content"].text.strip()
+    try:
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[system_message, user_message],
+            temperature = 0.7
+        )
+
+        answer = response["choices"][0]["message"]["content"]
+    except openai.error.OpenAIError as e:
+        raise HTTPException(status_code=500, detail=f"Error en OpenAI: {str(e)}")
 
     #guarda la conversación el la base de datos
     new_message = Message(user_id=user.id, question=message.question, response=response_text)
