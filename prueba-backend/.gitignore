@@ -1,0 +1,14 @@
+# Ignorar carpetas de dependencias y archivos innecesarios
+venv/
+include/
+lib/
+Scripts/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.DS_Store
+
+.env
+
